@@ -6,59 +6,6 @@ from typing import List
 from yadisk import YaDisk
 
 
-# class YandexManager:
-#     def __init__(self, token):
-#         self.disk = YaDisk(token=token)
-#         self.current_path = "/"
-#         self.folders = []
-#         self.BASE_WEB_URL = "https://disk.yandex.ru/client/disk"
-#
-#     def refresh_current_dir(self):
-#         self.folders = []
-#
-#         try:
-#             items = list(self.disk.listdir(self.current_path))
-#             for item in items:
-#                 if item.type == "dir":
-#                     self.folders.append(item.name)
-#         except Exception as e:
-#             print(f"Ошибка: {e}")
-#
-#     def get_current_folder_url(self):
-#         """Генерирует URL текущей папки"""
-#         if self.current_path == "/":
-#             return self.BASE_WEB_URL
-#
-#         encoded_path = "/".join(part.replace(" ", "%20") for part in self.current_path.split("/") if part)
-#         return f"{self.BASE_WEB_URL}/{encoded_path}"
-#
-#     def print_current_dir(self):
-#         folders = []
-#         for i, folder in enumerate(self.folders, 1):
-#             folders.append(folder)
-#
-#         return folders
-#
-#     def get_files_count(self):
-#         items = list(self.disk.listdir(self.current_path))
-#         files = [item for item in items if item.type == "file"]
-#         return len(files)
-#
-#     def change_dir(self, folder_index: int):
-#         if 1 <= folder_index <= len(self.folders):
-#             selected_folder = self.folders[folder_index - 1]
-#             self.current_path = os.path.join(self.current_path, selected_folder).replace("\\", "/")
-#             self.refresh_current_dir()
-#
-#     def go_back(self):
-#         if self.current_path != "/":
-#             self.current_path = os.path.dirname(self.current_path).replace("\\", "/")
-#             self.refresh_current_dir()
-#             print(f"\nВернулись в: {self.current_path}")
-#         else:
-#             print("Вы уже в корневой папке!")
-
-
 class YandexManager:
     def __init__(self, token: str):
         self.disk = YaDisk(token=token)
@@ -74,7 +21,7 @@ class YandexManager:
         return await loop.run_in_executor(self.executor, lambda: func(*args))
 
     async def refresh_current_dir(self) -> None:
-        """Только папки, без подсчета файлов если не нужно"""
+        """Обновление папок в директории"""
         self.folders = []
         try:
             items = await self._run_in_executor(
@@ -85,7 +32,7 @@ class YandexManager:
             print(f"Ошибка: {e}")
 
     async def get_files_count(self) -> int:
-        """Подсчет файлов через executor"""
+        """Подсчет файлов"""
         try:
             items = await self._run_in_executor(
                 lambda: list(self.disk.listdir(self.current_path))
@@ -96,7 +43,7 @@ class YandexManager:
             return 0
 
     async def change_dir(self, folder_index: int) -> bool:
-        """Смена директории с проверкой через executor"""
+        """Смена директории"""
         if 1 <= folder_index <= len(self.folders):
             selected_folder = self.folders[folder_index - 1]
 
@@ -111,7 +58,7 @@ class YandexManager:
         return False
 
     async def go_back(self) -> bool:
-        """Возврат назад с проверкой через executor"""
+        """Возврат назад"""
         if self.current_path != "/":
             # Асинхронное получение родительской директории
             parent_path = await self._run_in_executor(
@@ -130,7 +77,7 @@ class YandexManager:
         return False
 
     async def get_current_folder_url(self) -> str:
-        """Генерация URL через executor"""
+        """Генерация URL"""
         if self.current_path == "/":
             return self.BASE_WEB_URL
 
