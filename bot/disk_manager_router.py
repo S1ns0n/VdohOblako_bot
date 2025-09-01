@@ -7,13 +7,23 @@ from .keyboards import Keyboards
 from .utils import Utils
 from config.config import Config
 
-start_router = Router()
+
+from database.database import (
+    create_user,
+    get_all_users,
+    get_user_by_tg_id,
+    delete_user,
+    get_user_count
+)
+
+
+disk_manager_router = Router()
 keyboards = Keyboards()
 
 manager = YandexManager(Config.YANDEX_API_TOKEN)
 
 
-@start_router.message(Command('start'))
+@disk_manager_router.message(Command('disk'))
 async def start_bot(message: types.Message, bot: Bot):
     # чо вообще делаем дальше:
     # добовляем статистическую информацию о каждой папке (сколько файлов например) ✅
@@ -30,7 +40,7 @@ async def start_bot(message: types.Message, bot: Bot):
                            reply_markup=await keyboards.main_welcome_board(folders=manager.folders))
 
 
-@start_router.callback_query(F.data.startswith("folder_"))
+@disk_manager_router.callback_query(F.data.startswith("folder_"))
 async def process_dir(call: types.CallbackQuery, bot: Bot):
     dir_index = await Utils.extract_number(call.data)
 
@@ -47,7 +57,7 @@ async def process_dir(call: types.CallbackQuery, bot: Bot):
     await call.answer()
 
 
-@start_router.callback_query(F.data.startswith("nav_"))
+@disk_manager_router.callback_query(F.data.startswith("nav_"))
 async def procces_nav(call: types.CallbackQuery, bot: Bot):
     action = call.data
 
@@ -63,5 +73,9 @@ async def procces_nav(call: types.CallbackQuery, bot: Bot):
                 reply_markup=await keyboards.main_welcome_board(folders=manager.folders)
             )
             await call.answer()
+
+        case "nav_select":
+            pass
+
 
 

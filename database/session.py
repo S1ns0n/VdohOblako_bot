@@ -1,28 +1,29 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 import os
 
-# Настройки базы данных
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./app.db")
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./bot_database.db")
 
-# Создание движка
-engine = create_engine(
+engine = create_async_engine(
     DATABASE_URL,
-    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {},
-    echo=False
+    echo=False,
+    connect_args={"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 )
 
-# Создание фабрики сессий
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+AsyncSessionLocal = async_sessionmaker(
+    engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
 
-def init_db():
-    """Инициализация базы данных (создание таблиц)"""
+
+async def init_db():
+    """инициализация базы данных"""
     from .models import Base
-    Base.metadata.create_all(bind=engine)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
 
-def get_db_session():
-    """
-    Получение сессии базы данных.
-    Возвращает сессию, которую нужно закрыть после использования.
-    """
-    return SessionLocal()
+
+async def get_async_session() -> AsyncSession:
+    """Получение сессии"""
+    async with AsyncSessionLocal() as session:
+        yield session

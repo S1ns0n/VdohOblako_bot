@@ -1,3 +1,6 @@
 .venv
 .env
 .idea
+*.db
+*.sqlite
+*.sqlite3
