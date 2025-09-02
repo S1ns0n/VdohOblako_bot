@@ -1,7 +1,7 @@
 import asyncio
 import os
 from concurrent.futures import ThreadPoolExecutor
-from typing import List
+from typing import List, BinaryIO
 
 from yadisk import YaDisk
 
@@ -19,6 +19,21 @@ class YandexManager:
         """Запускает синхронную функцию в executor'е"""
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(self.executor, lambda: func(*args))
+
+    async def upload_file(self, file_obj: BinaryIO, filename: str) -> bool:
+        """Загружает файл на Яндекс.Диск в текущую директорию"""
+        try:
+            remote_path = f"{self.current_path.rstrip('/')}/{filename}"
+            file_obj.seek(0)
+
+            await self._run_in_executor(
+                self.disk.upload, file_obj, remote_path
+            )
+            return True
+
+        except Exception as e:
+            print(f"Ошибка загрузки файла '{filename}': {e}")
+            return False
 
     async def refresh_current_dir(self) -> None:
         """Обновление папок в директории"""

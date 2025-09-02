@@ -22,9 +22,13 @@ keyboards = Keyboards()
 
 manager = YandexManager(Config.YANDEX_API_TOKEN)
 
+@disk_manager_router.message(Command('path'))
+async def start_disk(message: types.Message, bot: Bot):
+    await message.answer(text=f"{manager.current_path}")
+
 
 @disk_manager_router.message(Command('disk'))
-async def start_bot(message: types.Message, bot: Bot):
+async def start_disk(message: types.Message, bot: Bot):
     # чо вообще делаем дальше:
     # добовляем статистическую информацию о каждой папке (сколько файлов например) ✅
     # подготовить проект к закидыванию на гитхаб ✅

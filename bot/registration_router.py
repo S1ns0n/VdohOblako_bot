@@ -27,7 +27,7 @@ async def start_bot(message: types.Message, bot: Bot):
 
     loading_msg = await bot.send_message(message.from_user.id, "⏳ Загрузка...")
 
-    # await create_user(tg_id=)
+    await create_user(tg_id=message.from_user.id)
 
     await loading_msg.edit_text(
         text=f"Вы зареганы!")
