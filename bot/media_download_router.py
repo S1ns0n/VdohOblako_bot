@@ -22,5 +22,7 @@ async def download_photo(message: types.Message, bot: Bot):
 
         await manager.upload_file(file_obj=photo_io, filename=photo.file_id)
 
+        await message.answer("загружено!")
+
     except Exception as e:
         await message.answer(f"❌ Ошибка: {str(e)}")

@@ -8,15 +8,28 @@ async def create_user(tg_id: int, path: str = "/") -> User | None:
     """Создание нового пользователя (асинхронно)"""
     async with AsyncSessionLocal() as db:
         try:
-            record = User(tg_id=tg_id, path=path)
-            db.add(record)
+            user = User(tg_id=tg_id, path=path)
+            db.add(user)
             await db.commit()
-            await db.refresh(record)
-            return record
+            await db.refresh(user)
+            return user
         except Exception as e:
             await db.rollback()
             print(f"Ошибка при создании записи: {e}")
             return None
+
+
+async def check_user_exists(tg_id: int) -> bool:
+    """Проверка наличия пользователя в базе данных"""
+    async with AsyncSessionLocal() as db:
+        try:
+            result = await db.execute(
+                select(User).filter_by(tg_id=tg_id)
+            )
+            return result.scalar() is not None
+        except Exception as e:
+            print(f"Ошибка при проверке наличия пользователя: {e}")
+            return False
 
 
 async def get_all_users() -> list[User]:
@@ -34,7 +47,6 @@ async def get_user_by_tg_id(tg_id: int) -> User | None:
     """Получение пользователя по ID (асинхронно)"""
     async with AsyncSessionLocal() as db:
         try:
-            # Альтернатива с filter_by
             result = await db.execute(
                 select(User).filter_by(tg_id=tg_id)
             )

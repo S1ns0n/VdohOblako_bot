@@ -13,7 +13,7 @@ async def main() -> None:
     await init_db()
     bot = Bot(token=Config.BOT_TOKEN)
     dp = Dispatcher()
-    # dp.update.outer_middleware(MediaBlockMiddleware())
+    dp.update.outer_middleware(MediaBlockMiddleware())
 
     dp.include_router(disk_manager_router)
     dp.include_router(registration_router)

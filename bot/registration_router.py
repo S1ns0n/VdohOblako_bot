@@ -13,7 +13,8 @@ from database.database import (
     get_all_users,
     get_user_by_tg_id,
     delete_user,
-    get_user_count
+    get_user_count,
+    check_user_exists
 )
 
 
@@ -24,10 +25,11 @@ keyboards = Keyboards()
 @registration_router.message(Command('start'))
 async def start_bot(message: types.Message, bot: Bot):
 
-
     loading_msg = await bot.send_message(message.from_user.id, "⏳ Загрузка...")
+    if await check_user_exists(message.from_user.id):
+        await loading_msg.edit_text(f"Вы уже зареганы!")
+        return
 
     await create_user(tg_id=message.from_user.id)
-
     await loading_msg.edit_text(
         text=f"Вы зареганы!")

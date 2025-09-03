@@ -5,12 +5,15 @@ from typing import Callable, Dict, Any, Awaitable
 from aiogram import BaseMiddleware
 from aiogram.types import Update
 
+from database.database import (
+    check_user_exists
+)
 
 class MediaBlockMiddleware(BaseMiddleware):
     def __init__(self):
         super().__init__()
         self.last_block_time = {}
-        self.block_cooldown = 2
+        self.block_cooldown = 1
         self.locks = {}
 
     async def __call__(
@@ -25,13 +28,16 @@ class MediaBlockMiddleware(BaseMiddleware):
         message = event.message
         chat_id = message.chat.id
 
-        # Проверяем наличие медиа
+        if await check_user_exists(message.from_user.id):
+            print("не блокаем")
+            return await handler(event, data)
+
+
         if any([
             message.photo, message.video, message.document,
             message.audio, message.voice, message.video_note,
             message.sticker, message.animation
         ]):
-            # Создаем lock для этого чата если его нет
             if chat_id not in self.locks:
                 self.locks[chat_id] = asyncio.Lock()
 
