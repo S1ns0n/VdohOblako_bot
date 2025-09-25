@@ -13,7 +13,8 @@ class Keyboards:
 
         builder.row(
             InlineKeyboardButton(text="◀️ Назад", callback_data="nav_back"),
-            InlineKeyboardButton(text="✅ Выбрать папку", callback_data="nav_select")
+            InlineKeyboardButton(text="✅ Выбрать папку", callback_data="nav_select"),
+        InlineKeyboardButton(text="#️⃣ В Корень", callback_data="nav_root")
         )
 
 

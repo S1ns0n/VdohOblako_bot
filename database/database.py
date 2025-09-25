@@ -44,7 +44,9 @@ async def get_all_users() -> list[User]:
 
 
 async def get_user_by_tg_id(tg_id: int) -> User | None:
-    """Получение пользователя по ID (асинхронно)"""
+    """Получение пользователя по ID (асинхронно)
+    :rtype: object
+    """
     async with AsyncSessionLocal() as db:
         try:
             result = await db.execute(
@@ -76,6 +78,7 @@ async def update_user_path(tg_id: int, path: str = "/") -> User | None:
             await db.rollback()
             print(f"Ошибка при обновлении записи: {e}")
             return None
+
 
 
 async def delete_user(tg_id: int) -> bool:
