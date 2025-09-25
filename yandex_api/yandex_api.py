@@ -2,7 +2,7 @@ import asyncio
 import os
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, BinaryIO
-
+from config.config import Config
 from yadisk import YaDisk
 
 
@@ -12,7 +12,7 @@ class YandexManager:
         self.current_path = "/"
         self.folders: List[str] = []
         self._files_count: int = 0
-        self.BASE_WEB_URL = "https://disk.yandex.ru/client/disk"
+        self.BASE_WEB_URL = Config.YANDEX_MAIN_PATH
         self.executor = ThreadPoolExecutor()
 
     async def _run_in_executor(self, func, *args):
@@ -62,7 +62,6 @@ class YandexManager:
         if 1 <= folder_index <= len(self.folders):
             selected_folder = self.folders[folder_index - 1]
 
-            # Асинхронное построение пути
             new_path = await self._run_in_executor(
                 lambda: os.path.join(self.current_path, selected_folder).replace("\\", "/")
             )
@@ -75,12 +74,10 @@ class YandexManager:
     async def go_back(self) -> bool:
         """Возврат назад"""
         if self.current_path != "/":
-            # Асинхронное получение родительской директории
             parent_path = await self._run_in_executor(
                 lambda: os.path.dirname(self.current_path).replace("\\", "/")
             )
 
-            # Проверяем, что путь существует на диске
             path_exists = await self._run_in_executor(
                 lambda: self.disk.exists(parent_path)
             )

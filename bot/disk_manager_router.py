@@ -24,7 +24,7 @@ keyboards = Keyboards()
 manager = YandexManager(Config.YANDEX_API_TOKEN)
 
 @disk_manager_router.message(Command('path'))
-async def start_disk(message: types.Message, bot: Bot):
+async def get_path(message: types.Message, bot: Bot):
     await message.answer(text=f"{manager.current_path}")
 
 

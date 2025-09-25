@@ -6,7 +6,7 @@ from yandex_api.yandex_api import YandexManager
 from .keyboards import Keyboards
 from .utils import Utils
 from config.config import Config
-
+from .disk_manager_router import start_disk
 
 from database.database import (
     create_user,
@@ -27,7 +27,9 @@ async def start_bot(message: types.Message, bot: Bot):
 
     loading_msg = await bot.send_message(message.from_user.id, "⏳ Загрузка...")
     if await check_user_exists(message.from_user.id):
-        await loading_msg.edit_text(f"Вы уже зареганы!")
+        await start_disk(message=message,
+                         bot=bot)
+        await loading_msg.delete()
         return
 
     await create_user(tg_id=message.from_user.id)
