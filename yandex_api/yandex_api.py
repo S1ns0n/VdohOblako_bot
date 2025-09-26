@@ -6,6 +6,7 @@ from config.config import Config
 from yadisk import YaDisk
 from database.database import get_user_by_tg_id
 from database.models import User
+from logger import main_logger
 class YandexManager:
     def __init__(self, token: str):
         self.disk = YaDisk(token=token)
@@ -52,7 +53,7 @@ class UserSession:
             )
             return True
         except Exception as e:
-            print(f"Ошибка загрузки файла '{filename}' для пользователя {self.user_tg_id}: {e}")
+            await main_logger.error(f"Ошибка загрузки файла '{filename}' для пользователя {self.user_tg_id}: {e}")
             return False
 
     async def refresh_current_dir(self) -> None:
@@ -67,7 +68,7 @@ class UserSession:
             if item.type == "dir"
         )
         except Exception as e:
-            print(f"Ошибка у пользователя {self.user_tg_id}: {e}")
+            await main_logger.error(f"Ошибка у пользователя {self.user_tg_id}: {e}")
 
     async def get_files_count(self) -> int:
         """Подсчет файлов в директории пользователя"""
@@ -77,7 +78,7 @@ class UserSession:
             )
             return sum(1 for item in items if item.type == "file")
         except Exception as e:
-            print(f"Ошибка подсчета файлов у пользователя {self.user_tg_id}: {e}")
+            await main_logger.error(f"Ошибка подсчета файлов у пользователя {self.user_tg_id}: {e}")
             return 0
 
     async def change_dir(self, folder_index: int) -> bool:
@@ -148,7 +149,6 @@ class SessionManager:
     async def close_user_session(self, user_tg_id: int):
         """Закрывает сессию пользователя"""
         if user_tg_id in self.user_sessions:
-            # Можно добавить сохранение данных перед закрытием
             del self.user_sessions[user_tg_id]
 
     async def close_all(self):

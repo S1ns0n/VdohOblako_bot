@@ -5,7 +5,7 @@ from aiogram import F, types
 from aiogram import Router
 
 from .disk_manager_router import session_manager
-
+from logger import main_logger
 media_downloader = Router()
 media_groups = {}
 
@@ -40,7 +40,8 @@ async def download_single_photo(message: types.Message, bot: Bot):
             await message.answer("❌ Ошибка загрузки фото")
 
     except Exception as e:
-        await message.answer(f"❌ Ошибка: {str(e)}")
+        await main_logger.error(f"Ошибка загрузки одиночной фотографии: {e}")
+        await message.answer(f"❌ Ошибка загрузки фотографии. Попробуйте позже")
 
 
 @media_downloader.message(F.photo & F.media_group_id)
@@ -120,8 +121,8 @@ async def process_media_group(media_group_id: str, bot: Bot, message_id: int):
         )
 
     except Exception as e:
-        error_message = f"❌ Ошибка загрузки медиагруппы: {str(e)}"
-        await bot.send_message(chat_id, error_message)
+        await main_logger.error(f"Ошибка загрузки медиагруппы: {e}")
+        await bot.send_message(chat_id, text="❌ Ошибка загрузки медиагруппы.Попробуйте позже")
 
     finally:
         # Удаляем обработанную группу из временного хранилища
@@ -149,4 +150,5 @@ async def download_document(message: types.Message, bot: Bot):
             await message.answer("❌ Ошибка загрузки документа")
 
     except Exception as e:
-        await message.answer(f"❌ Ошибка: {str(e)}")
+        await main_logger.error(f"Ошибка загрузки документа: {e}")
+        await message.answer(f"❌ Ошибка загрузки документа. Попробуйте позже")
