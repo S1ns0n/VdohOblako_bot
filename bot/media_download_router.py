@@ -91,7 +91,7 @@ async def process_media_group(media_group_id: str, bot: Bot, message_id: int):
 
     try:
         # Получаем сессию пользователя
-        user_session = session_manager.get_user_session(user_id)
+        user_session = await session_manager.get_user_session(user_id)
         downloaded_files = []
 
         # Скачиваем все медиа из группы
@@ -104,10 +104,7 @@ async def process_media_group(media_group_id: str, bot: Bot, message_id: int):
                 import time
                 filename = f"{int(time.time())}_{photo.file_id}.jpg"
 
-                success = await user_session.upload_file(
-                    file_obj=photo_io,
-                    filename=filename
-                )
+                success = await user_session.upload_file(file_obj=photo_io, filename=filename)
 
                 if success:
                     downloaded_files.append(filename)
