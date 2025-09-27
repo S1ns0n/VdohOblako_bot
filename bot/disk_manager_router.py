@@ -25,17 +25,17 @@ session_manager = SessionManager(Config.YANDEX_API_TOKEN)
 
 @disk_manager_router.message(Command('path'))
 async def get_path(message: types.Message):
-    user_session = await session_manager.get_user_session(message.from_user.id)
+    user_session = await session_manager.get_user_session(message.chat.id)
     await message.delete()
     await message.answer(text=f"💾 Ваш путь для сохранения: {user_session.current_path}")
 
 
 @disk_manager_router.message(Command('disk'))
 async def start_disk(message: types.Message, bot: Bot):
-    user_session = await session_manager.get_user_session(message.from_user.id)
+    user_session = await session_manager.get_user_session(message.chat.id)
 
     await message.delete()
-    loading_msg = await bot.send_message(chat_id=message.from_user.id, text="⏳ Загрузка...")
+    loading_msg = await bot.send_message(chat_id=message.chat.id, text="⏳ Загрузка...")
 
     await user_session.refresh_current_dir()
 
@@ -47,10 +47,10 @@ async def start_disk(message: types.Message, bot: Bot):
 
 @disk_manager_router.callback_query(F.data.startswith("folder_"))
 async def process_dir(call: types.CallbackQuery, bot: Bot):
-    user_session = await session_manager.get_user_session(call.from_user.id)
+    user_session = await session_manager.get_user_session(call.message.chat.id)
     dir_index = await Utils.extract_number(call.data)
 
-    loading_msg = await bot.edit_message_text(chat_id=call.from_user.id, text="⏳ Загрузка...", message_id=call.message.message_id)
+    loading_msg = await bot.edit_message_text(chat_id=call.message.chat.id, text="⏳ Загрузка...", message_id=call.message.message_id)
 
     await user_session.change_dir(folder_index=dir_index)
 
@@ -63,9 +63,9 @@ async def process_dir(call: types.CallbackQuery, bot: Bot):
 
 @disk_manager_router.callback_query(F.data.startswith("nav_"))
 async def procces_nav(call: types.CallbackQuery, bot: Bot):
-    user_session = await session_manager.get_user_session(call.from_user.id)
+    user_session = await session_manager.get_user_session(call.message.chat.id)
     action = call.data
-    loading_msg = await bot.edit_message_text(chat_id=call.from_user.id, text="⏳ Загрузка...", message_id=call.message.message_id)
+    loading_msg = await bot.edit_message_text(chat_id=call.message.chat.id, text="⏳ Загрузка...", message_id=call.message.message_id)
 
     match action:
         case "nav_back":

@@ -24,3 +24,23 @@ class Keyboards:
         builder.adjust(2, *[1] * len(folders))
 
         return builder.as_markup()
+
+    @staticmethod
+    async def new_user_board() -> InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+
+        builder.row(
+            InlineKeyboardButton(text="🔒 Ввести пароль", callback_data="reg_enter_password"),
+        )
+
+        return builder.as_markup()
+
+    @staticmethod
+    async def go_to_disk_board() -> InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+
+        builder.row(
+            InlineKeyboardButton(text="💾 Диск", callback_data="go_to_disk"),
+        )
+
+        return builder.as_markup()
