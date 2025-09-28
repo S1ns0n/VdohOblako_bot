@@ -1,6 +1,7 @@
 from aiogram import Bot, types, F
 from aiogram import Router
 from aiogram.filters import Command
+from aiogram.enums import ParseMode
 
 from yandex_api.yandex_api import SessionManager
 from .keyboards import Keyboards
@@ -83,7 +84,9 @@ async def procces_nav(call: types.CallbackQuery, bot: Bot):
             )
 
             await loading_msg.edit_text(
-                text=f"Путь выбран успешно!"
+                text="🎯 <b>Путь выбран успешно!</b>\n\n"
+                     "📸 Теперь вы можете скидывать фотографии и другие медиафайлы",
+                parse_mode=ParseMode.HTML
             )
         case "nav_root":
             user_session.current_path = "/"

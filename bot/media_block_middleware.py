@@ -27,11 +27,31 @@ class MediaBlockMiddleware(BaseMiddleware):
 
         message = event.message
         chat_id = message.chat.id
+        user_id = message.from_user.id
 
-        if await check_user_exists(message.from_user.id):
-            print("не блокаем")
+        # Обработка текстовых сообщений
+        if message.text:
+            # Пропускаем команды (сообщения начинающиеся с '/')
+            if message.text.startswith('/'):
+                return await handler(event, data)
+
+            # Проверяем наличие FSM через state
+            state = data.get('state')
+            if state:
+                current_state = await state.get_state()
+                if current_state is not None:
+                    # FSM активна - пропускаем обработку
+                    return await handler(event, data)
+
+            bot = data['bot']
+            await bot.delete_message(
+                chat_id=chat_id,
+                message_id=message.message_id
+            )
+
+
+        if await check_user_exists(user_id):
             return await handler(event, data)
-
 
         if any([
             message.photo, message.video, message.document,
