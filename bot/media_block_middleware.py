@@ -30,9 +30,9 @@ class MediaBlockMiddleware(BaseMiddleware):
         user_id = message.from_user.id
 
         # Обработка текстовых сообщений
-        if message.text:
-            # Пропускаем команды (сообщения начинающиеся с '/')
-            if message.text.startswith('/'):
+        if message.content_type in ['text', 'sticker']:
+            # Пропускаем команды (текстовые сообщения начинающиеся с '/')
+            if message.content_type == 'text' and message.text.startswith('/'):
                 return await handler(event, data)
 
             # Проверяем наличие FSM через state
